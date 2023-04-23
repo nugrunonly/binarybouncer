@@ -176,7 +176,8 @@ class BinaryBouncer:
         await self.chat.send_message('binarybouncer', f'Finished unbanning all bots on {username}\'s channel.')
 
 
-    async def super_ban(self, channel, id):   
+    async def super_ban(self, channel, id):
+        finished = True   
         await self.chat.send_message('binarybouncer', f'Starting mass exodus of bots on {channel}\'s channel. This can take a while, please be patient...')
         with open('alivebots.json') as activebots:
             active_bots = json.load(activebots)
@@ -193,31 +194,32 @@ class BinaryBouncer:
                             del old_data[channel]
                             with open('channels.json', mode = 'w') as c:
                                 json.dump(old_data, c, indent = 2, ensure_ascii = False)
+                    finished = False
                     break
                 await asyncio.sleep(0.4)
-        await self.chat.send_message('binarybouncer', f'Finished banning all bots on {channel}\'s channel.')
-        with open('joinhistory.txt', 'r+') as joinHistory:
-            joined = joinHistory.read()
-            joinHistory.write(f'{channel}\n')
-            print('Added', channel, 'to the join history')
+        if finished:
+            await self.chat.send_message('binarybouncer', f'Finished banning all bots on {channel}\'s channel.')
+            with open('joinhistory.txt', 'r+') as joinHistory:
+                joinHistory.write(f'{channel}\n')
+                print('Added', channel, 'to the join history')
 
-    async def test(self, cmd:ChatCommand):
-        await self.unban_user('test', '1234567890')
-
-
-    async def test2(self):
-        user = 'testtesttest'
-        with open('channels.json') as channels:
-            c = json.load(channels)
-            id = await self.get_user_id(user)
-            await self.add_bot(user, id)
-            for ch in c:
-                await self.ban_user(user, c[ch])
-                await asyncio.sleep(0.4)
+    # async def test(self, cmd:ChatCommand):
+    #     await self.unban_user('test', '1234567890')
 
 
-    async def ban_target(self):
-        await self.super_ban('test', '1234567890')
+    # async def test2(self):
+    #     user = 'testtesttest'
+    #     with open('channels.json') as channels:
+    #         c = json.load(channels)
+    #         id = await self.get_user_id(user)
+    #         await self.add_bot(user, id)
+    #         for ch in c:
+    #             await self.ban_user(user, c[ch])
+    #             await asyncio.sleep(0.4)
+
+
+    # async def ban_target(self):
+    #     await self.super_ban('test', '1234567890')
 
 
     async def ban_routine(self):
@@ -271,7 +273,7 @@ class BinaryBouncer:
         self.chat.register_command('ilovebots', self.super_leave)
         # self.chat.register_command('test', self.test)
         # self.chat.register_command('bantarget', self.ban_target)
-        self.chat.register_command('test2', self.test2)
+        # self.chat.register_command('test2', self.test2)
         self.chat.start()
 
         try:
